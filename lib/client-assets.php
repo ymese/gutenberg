@@ -77,6 +77,12 @@ function gutenberg_register_scripts_and_styles() {
 
 	// WordPress packages.
 	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
+	wp_register_script(
+		'wp-tinymce-annotations',
+		gutenberg_url( 'editor/components/rich-text/annotations/tinymce-plugin.js' ),
+		array( 'wp-tinymce' ),
+		true
+	);
 
 	wp_register_script(
 		'wp-url',
@@ -478,6 +484,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-keycodes',
 			'wp-nux',
 			'wp-tinymce',
+			'wp-tinymce-annotations',
 			'wp-url',
 			'wp-viewport',
 			'wp-wordcount',
