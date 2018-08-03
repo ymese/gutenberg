@@ -9,15 +9,46 @@ class Annotations extends Component {
 		};
 	}
 
-	shouldComponentUpdate( nextProps, nextState ) {
-		return nextProps.annotations.length !== this.state.annotationsLength;
-
-		// return nextProps.annotations !== this.props.annotations;
+	/**
+	 * Prevents re-rendering if the same annotations are passed. This prevents
+	 * performance issues when the change tracking in tinyMCE adjusts the
+	 * annotations and this component receives new annotations.
+	 *
+	 * This has the downside that annotations cannot be moved from the outside. This
+	 * can easily be solved by inserting an annotation with a new ID instead. This
+	 * forces a re-render by this component.
+	 *
+	 * @param {Object} nextProps The new props this component will receive.
+	 *
+	 * @return {boolean} Whether this component should be re-rendered.
+	 */
+	shouldComponentUpdate( nextProps ) {
+		return Annotations.combineAnnotationIds( nextProps.annotations ) !== this.state.annotationIds;
 	}
 
-	static getDerivedStateFromProps( props, state ) {
+	/**
+	 * Combines annotation ids into a string seperated by dashes.
+	 *
+	 * @param {Object[]} annotations Annotation objects.
+	 *
+	 * @return {string} Combined annotation IDs.
+	 */
+	static combineAnnotationIds( annotations ) {
+		return annotations.map( ( ids, annotation ) => {
+			return ids + '-' + annotation.id;
+		} ).join( '-' );
+	}
+
+	/**
+	 * Returns state changes necessary for new props.
+	 *
+	 * @param {Object} props The props this component received.
+	 *
+	 * @return {Object} The state changes that are required by the given props.
+	 */
+	static getDerivedStateFromProps( props ) {
 		return {
-			annotationsLength: props.annotations.length,
+			annotationIds: Annotations.combineAnnotationIds( props.annotations ),
 		};
 	}
 
@@ -37,7 +68,7 @@ class Annotations extends Component {
 	 *
 	 * This causes us to have a declarative API on top of tinyMCE's imperative API.
 	 *
-	 * @return {null} Always returns null to not render anything.
+	 * @return {WPElement} Might render debugging information.
 	 */
 	render() {
 		const { annotations, editor } = this.props;
@@ -62,11 +93,40 @@ class Annotations extends Component {
 
 		// Catch here because componentDidCatch catches only in child components.
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
 			console.error( 'Error occurred in anotations module', error );
-			this.props.onError();
+			// this.props.onError();
+		}
+
+		// Debugging information makes it much easier to develop annotations.
+		// This if should be stripped in the production build.
+		if ( process.env.NODE_ENV === 'development' ) {
+			return this.renderDebug();
 		}
 
 		return null;
+	}
+
+	/**
+	 * Renders debugging information that makes it much easier to see why a certain
+	 * annotation didn't apply.
+	 *
+	 * @return {WPElement} The rendered React tree.
+	 */
+	renderDebug() {
+		const ReactJson = require( 'react-json-view' ).default;
+
+		const styles = {
+			border: '1px solid red',
+		};
+
+		return <div className="annotation-marker-debug" style={ styles }>
+			<h3>Raw HTML content</h3>
+			{ this.props.editor.getContent() }
+
+			<h3>Annotations JSON</h3>
+			<ReactJson src={ this.props.annotations } />
+		</div>;
 	}
 }
 
