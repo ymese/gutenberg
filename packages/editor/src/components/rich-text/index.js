@@ -799,13 +799,7 @@ export class RichText extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		let classes = classnames( wrapperClassName, 'editor-rich-text' );
-
-		// if ( annotationTarget !== '' ) {
-		classes += " annotation-target";
-			// classes.push( 'annotation-target' );
-			// classes.push( 'annotation-target' + annotationTarget );
-		// }
+		const classes = classnames( wrapperClassName, 'editor-rich-text annotation-target' );
 
 		const formatToolbar = (
 			<FormatToolbar
