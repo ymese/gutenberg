@@ -11,8 +11,8 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord, getEntityRecords, getEmbedPreview } from '../resolvers';
-import { receiveTerms, receiveEntityRecords, addEntities, receiveEmbedPreview } from '../actions';
+import { getCategories, getEntityRecord, getEntityRecords, getEmbedPreview, hasUploadPermissions } from '../resolvers';
+import { receiveTerms, receiveEntityRecords, addEntities, receiveEmbedPreview, receiveUploadPermissions } from '../actions';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -137,5 +137,78 @@ describe( 'getEmbedPreview', () => {
 		const fulfillment = getEmbedPreview( {}, UNEMBEDDABLE_URL );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveEmbedPreview( UNEMBEDDABLE_URL, UNEMBEDDABLE_RESPONSE ) );
+	} );
+} );
+
+describe( 'hasUploadPermissions', () => {
+	describe( 'a normal fetch request for a user with upload_file capabilities', () => {
+		// When retrieving a non-preloaded request, the header is an object of the type Header.
+		const ADMIN_FETCH_RESPONSE = {
+			headers: {
+				get: () => 'GET,POST,PUT,OPTIONS',
+			},
+		};
+
+		beforeAll( () => {
+			apiFetch.mockImplementation( ( options ) => {
+				if ( options.path === '/wp/v2/media' ) {
+					return Promise.resolve( ADMIN_FETCH_RESPONSE );
+				}
+				throw 404;
+			} );
+		} );
+
+		it( 'yields true if the response header allow parameters contains POST', async () => {
+			const fulfillment = hasUploadPermissions();
+			const received = ( await fulfillment.next() ).value;
+			expect( received ).toEqual( receiveUploadPermissions( true ) );
+		} );
+	} );
+
+	describe( 'a preloaded request for a user with upload_file capabilities', () => {
+		// For a preloaded request, the header is an object with simple properties.
+		const ADMIN_PRELOADED_RESPONSE = {
+			headers: {
+				Allow: 'GET,POST,PUT,OPTIONS',
+			},
+		};
+
+		beforeAll( () => {
+			apiFetch.mockImplementation( ( options ) => {
+				if ( options.path === '/wp/v2/media' ) {
+					return Promise.resolve( ADMIN_PRELOADED_RESPONSE );
+				}
+				throw 404;
+			} );
+		} );
+
+		it( 'yields true if the response header allow parameters contains POST', async () => {
+			const fulfillment = hasUploadPermissions();
+			const received = ( await fulfillment.next() ).value;
+			expect( received ).toEqual( receiveUploadPermissions( true ) );
+		} );
+	} );
+
+	describe( 'a user without upload_file capabilities', () => {
+		const CONTRIBUTOR_RESPONSE = {
+			headers: {
+				get: () => 'GET',
+			},
+		};
+
+		beforeAll( () => {
+			apiFetch.mockImplementation( ( options ) => {
+				if ( options.path === '/wp/v2/media' ) {
+					return Promise.resolve( CONTRIBUTOR_RESPONSE );
+				}
+				throw 404;
+			} );
+		} );
+
+		it( 'yields false if the response header allow parameters do not contain POST', async () => {
+			const fulfillment = hasUploadPermissions();
+			const received = ( await fulfillment.next() ).value;
+			expect( received ).toEqual( receiveUploadPermissions( false ) );
+		} );
 	} );
 } );
