@@ -403,11 +403,11 @@ export class BlockListBlock extends Component {
 		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
 		// We allow an invalid block to be re-edited in HTML mode
-		const isValidMode = isValid || mode === 'html';
+		const isValidOrHtmlMode = isValid || mode === 'html';
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
-			'has-warning': ! isValidMode || !! error,
+			'has-warning': ! isValidOrHtmlMode || !! error,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-selected-parent': shouldAppearSelectedParent,
@@ -541,7 +541,7 @@ export class BlockListBlock extends Component {
 						{ mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
-						{ ! isValidMode && [
+						{ ! isValidOrHtmlMode && [
 							<BlockInvalidWarning
 								key="invalid-warning"
 								block={ block }
