@@ -9,6 +9,7 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import storage from '@wordpress/storage';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -89,6 +90,11 @@ export const requestPostUpdate = async ( action, store ) => {
 
 	const postType = await resolveSelector( 'core', 'getPostType', getCurrentPostType( state ) );
 
+	const postsDatabase = storage( 'wp_posts' );
+	console.debug( 'post', post );
+	console.debug( 'toSend', toSend );
+	await postsDatabase.setItem( `post-id-${ post.id }`, { ...post, ...toSend } );
+
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
@@ -155,6 +161,18 @@ export const requestPostUpdate = async ( action, store ) => {
 			isAutosave,
 		} );
 	} catch ( error ) {
+		if ( error.code === 'no_network_connection' ) {
+			console.debug( 'Could not save; saving post offline.', error );
+
+			dispatch( {
+				type: 'REQUEST_POST_UPDATE_PENDING',
+				post,
+				isAutosave,
+			} );
+
+			return;
+		}
+
 		dispatch( {
 			type: 'REQUEST_POST_UPDATE_FAILURE',
 			optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
@@ -278,6 +296,34 @@ export const requestPostUpdateFailure = ( action, store ) => {
 		noticeMessage;
 
 	dispatch( createErrorNotice( cloudflaredMessage, { id: SAVE_POST_NOTICE_ID } ) );
+};
+
+/**
+ * Request Post Update Pending Effect handler
+ *
+ * @param {Object} action  action object.
+ * @param {Object} store   Redux Store.
+ */
+export const requestPostUpdatePending = ( action, store ) => {
+	const { isAutosave } = action;
+	const { dispatch } = store;
+
+	// Autosaves are neither shown a notice nor redirected.
+	if ( isAutosave ) {
+		console.debug( 'Autosave pending' );
+		return;
+	}
+
+	// Generic fallback notice.
+	const noticeMessage = __( 'Your connection appears offline, so this post was saved locally.' );
+
+	console.debug( 'Save pending' );
+	if ( noticeMessage ) {
+		dispatch( createSuccessNotice(
+			<p>{ noticeMessage }</p>,
+			{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
+		) );
+	}
 };
 
 /**

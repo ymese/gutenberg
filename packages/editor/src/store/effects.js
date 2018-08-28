@@ -52,6 +52,7 @@ import {
 	requestPostUpdate,
 	requestPostUpdateSuccess,
 	requestPostUpdateFailure,
+	requestPostUpdatePending,
 	trashPost,
 	trashPostFailure,
 	refreshPost,
@@ -64,6 +65,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS: requestPostUpdateSuccess,
 	REQUEST_POST_UPDATE_FAILURE: requestPostUpdateFailure,
+	REQUEST_POST_UPDATE_PENDING: requestPostUpdatePending,
 	TRASH_POST: ( action, store ) => {
 		trashPost( action, store );
 	},

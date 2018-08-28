@@ -841,6 +841,13 @@ export function saving( state = {}, action ) {
 				error: null,
 			};
 
+		case 'REQUEST_POST_UPDATE_PENDING':
+			return {
+				requesting: false,
+				successful: false,
+				error: null,
+			};
+
 		case 'REQUEST_POST_UPDATE_FAILURE':
 			return {
 				requesting: false,
