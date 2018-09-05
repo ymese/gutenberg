@@ -50,7 +50,10 @@ export function ReusableBlockConvertButton( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getReusableBlock } = select( 'core/editor' );
-		const { getFallbackBlockName } = select( 'core/blocks' );
+		const {
+			getUnstructuredFallbackBlockName,
+			getUnregisteredFallbackBlockName,
+		} = select( 'core/blocks' );
 
 		const block = getBlock( clientId );
 		if ( ! block ) {
@@ -60,7 +63,10 @@ export default compose( [
 		return {
 			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
 			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-			isVisible: block.name !== getFallbackBlockName(),
+			isVisible: (
+				block.name !== getUnstructuredFallbackBlockName() &&
+				block.name !== getUnregisteredFallbackBlockName()
+			),
 			isStaticBlock: ! isReusableBlock( block ) || ! getReusableBlock( block.attributes.ref ),
 		};
 	} ),
