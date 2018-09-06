@@ -74,7 +74,6 @@ const {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
-	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isFetchingReusableBlock,
@@ -2869,19 +2868,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
-		} );
-	} );
-
-	describe( 'getNotices', () => {
-		it( 'should return the notices array', () => {
-			const state = {
-				notices: [
-					{ id: 'b', content: 'Post saved' },
-					{ id: 'a', content: 'Error saving' },
-				],
-			};
-
-			expect( getNotices( state ) ).toEqual( state.notices );
 		} );
 	} );
 

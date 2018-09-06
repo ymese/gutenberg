@@ -26,6 +26,8 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /***
  * Module constants
@@ -1380,17 +1382,6 @@ export const getEditedPostContent = createSelector(
 );
 
 /**
- * Returns the user notices array.
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} List of notices.
- */
-export function getNotices( state ) {
-	return state.notices;
-}
-
-/**
  * Determines if the given block type is allowed to be inserted, and, if
  * parentClientId is provided, whether it is allowed to be nested within the
  * given parent.
@@ -1881,4 +1872,18 @@ export function getTokenSettings( state, name ) {
  */
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+}
+
+//
+// Deprecated
+//
+
+export function getNotices() {
+	deprecated( 'getNotices selector (`core/editor` store)', {
+		alternative: 'getNotices selector (`core/notices` store)',
+		plugin: 'Gutenberg',
+		version: '4.0',
+	} );
+
+	return select( 'core/notices' ).getNotices();
 }

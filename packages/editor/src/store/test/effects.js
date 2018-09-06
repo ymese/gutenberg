@@ -12,6 +12,7 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -28,6 +29,9 @@ import {
 import effects from '../effects';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
+import '../../';
+
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
@@ -245,16 +249,7 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post published!',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
@@ -267,20 +262,7 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>
-						Post reverted to draft.
-						{ ' ' }
-						{ false }
-					</p>,
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post reverted to draft.',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch notices when just updating a published post again', () => {
@@ -293,16 +275,7 @@ describe( 'effects', () => {
 			handler( { post, previousPost }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post updated!',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should do nothing if the updated post was autosaved', () => {
