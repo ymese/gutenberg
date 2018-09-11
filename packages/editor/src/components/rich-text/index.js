@@ -8,6 +8,7 @@ import {
 	identity,
 	noop,
 	isEqual,
+	cloneDeep,
 } from 'lodash';
 import memize from 'memize';
 
@@ -39,6 +40,8 @@ import {
 	getTextContent,
 	join,
 	insert,
+	matchXPath,
+	removeFormat,
 } from '@wordpress/rich-text-value';
 import deprecated from '@wordpress/deprecated';
 
@@ -429,13 +432,16 @@ export class RichText extends Component {
 	 *                                the live DOM.
 	 */
 	onChange( record, _withoutApply ) {
+		// Filter out annotations
+		const filteredRecord = removeFormat( record, 'mark', 0, record.text.length );
+
 		if ( ! _withoutApply ) {
-			this.applyRecord( record );
+			this.applyRecord( filteredRecord );
 		}
 
-		const { start, end } = record;
+		const { start, end } = filteredRecord;
 
-		this.savedContent = this.valueToFormat( record );
+		this.savedContent = this.valueToFormat( filteredRecord );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );
 	}
@@ -777,13 +783,50 @@ export class RichText extends Component {
 		}
 	}
 
+	applyAnnotations( record, annotations ) {
+		let annotationApplied = cloneDeep( record );
+
+		annotations.forEach( ( annotation ) => {
+			let startPos = matchXPath( record, annotation.startXPath );
+			let endPos = matchXPath( record, annotation.endXPath );
+
+			if ( startPos !== false ) {
+				startPos += annotation.startOffset;
+			}
+
+			if ( endPos !== false ) {
+				endPos += annotation.endOffset;
+			}
+
+			if (
+				startPos !== false &&
+				endPos !== false &&
+				startPos <= endPos &&
+				startPos <= record.text.length &&
+				endPos <= record.text.length
+			) {
+				annotationApplied = applyFormat(
+					annotationApplied,
+					{ type: 'mark' },
+					startPos,
+					endPos
+				);
+			}
+		} );
+
+		return annotationApplied;
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { tagName, value } = this.props;
+		const { tagName, value, annotations } = this.props;
+
+		const applyAnnotations = annotations !== prevProps.annotations;
 
 		if (
-			tagName === prevProps.tagName &&
+			( tagName === prevProps.tagName &&
 			value !== prevProps.value &&
-			value !== this.savedContent
+			value !== this.savedContent ) ||
+			applyAnnotations
 		) {
 			// The old way of passing a value with the `node` matcher required
 			// the value to be mapped first, creating a new array each time, so
@@ -794,7 +837,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			const record = this.formatToValue( value );
+			const record = this.applyAnnotations( this.formatToValue( value ), annotations );
 			const { start, end } = this.state;
 
 			if ( this.isActive() ) {
@@ -965,6 +1008,7 @@ const RichTextContainer = compose( [
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -972,15 +1016,17 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			annotations: select( 'core/editor' ).getAnnotationsForBlock( props.clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
