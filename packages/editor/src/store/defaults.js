@@ -87,13 +87,13 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 		{
 			name: __( 'Medium' ),
 			shortName: __( 'M' ),
-			size: 18,
+			size: 20,
 			slug: 'medium',
 		},
 		{
 			name: __( 'Large' ),
 			shortName: __( 'L' ),
-			size: 22,
+			size: 36,
 			slug: 'large',
 		},
 	],
