@@ -1,16 +1,6 @@
 .wp-block-table {
-	thead,
-	tbody,
-	tfoot {
-		// Ensure container takes up same size as parent `table` element.
-		height: inherit;
-	}
-
-	// Fixed layout toggle.
-	&.has-fixed-layout thead,
-	&.has-fixed-layout tbody,
-	&.has-fixed-layout tfoot {
-		display: table;
+	// Fixed layout toggle
+	&.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
 	}
