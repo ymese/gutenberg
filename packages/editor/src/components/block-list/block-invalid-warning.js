@@ -42,7 +42,7 @@ export class BlockInvalidWarning extends Component {
 			{ title: __( 'Convert to Blocks' ), onClick: convertToBlocks },
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
 			{ title: __( 'Compare Conversion' ), onClick: this.onCompare },
-			{ title: __( 'Overwrite with Valid Block' ), onCLick: overwriteBlock },
+			{ title: __( 'Overwrite with Valid Block' ), onClick: overwriteBlock },
 		];
 
 		if ( compare ) {
