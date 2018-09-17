@@ -155,11 +155,13 @@ export const settings = {
 		};
 
 		return (
-			<table className={ classes } style={ getTableStyles( attributes ) }>
-				<Section type="head" rows={ head } />
-				<Section type="body" rows={ body } />
-				<Section type="foot" rows={ foot } />
-			</table>
+			<div>
+				<table className={ classes } style={ getTableStyles( attributes ) }>
+					<Section type="head" rows={ head } />
+					<Section type="body" rows={ body } />
+					<Section type="foot" rows={ foot } />
+				</table>
+			</div>
 		);
 	},
 

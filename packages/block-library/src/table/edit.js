@@ -442,7 +442,7 @@ export default class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
@@ -502,7 +502,7 @@ export default class TableEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className="block-library-table__overflow_container">
+				<div className={ className }>
 					<table className={ classes } style={ getTableStyles( attributes ) }>
 						<Section type="head" rows={ head } />
 						<Section type="body" rows={ body } />
