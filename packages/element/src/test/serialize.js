@@ -19,6 +19,7 @@ import serialize, {
 	escapeQuotationMark,
 	escapeLessThan,
 	escapeAttribute,
+	escapeGreaterThan,
 	escapeHTML,
 	hasPrefix,
 	isValidAttributeName,
@@ -53,6 +54,14 @@ function testEscapeLessThan( implementation ) {
 	} );
 }
 
+function testEscapeGreaterThan( implementation ) {
+	it( 'should escape greater than', () => {
+		const result = implementation( 'Chicken > Ribs' );
+
+		expect( result ).toBe( 'Chicken &gt; Ribs' );
+	} );
+}
+
 describe( 'escapeAmpersand', () => {
 	testEscapeAmpersand( escapeAmpersand );
 } );
@@ -65,9 +74,14 @@ describe( 'escapeLessThan', () => {
 	testEscapeLessThan( escapeLessThan );
 } );
 
+describe( 'escapeGreaterThan', () => {
+	testEscapeGreaterThan( escapeGreaterThan );
+} );
+
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testEscapeGreaterThan( escapeAttribute );
 } );
 
 describe( 'escapeHTML', () => {
@@ -606,7 +620,7 @@ describe( 'renderAttributes()', () => {
 				href: '/index.php?foo=bar&qux=<"scary">',
 			} );
 
-			expect( result ).toBe( ' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;>"' );
+			expect( result ).toBe( ' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"' );
 		} );
 
 		it( 'should render numeric attributes', () => {

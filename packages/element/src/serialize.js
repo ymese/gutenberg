@@ -288,12 +288,26 @@ export function escapeLessThan( value ) {
 }
 
 /**
+ * Returns a string with grater-than sign replaced.
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeGreaterThan( value ) {
+	return value.replace( />/g, '&gt;' );
+}
+
+/**
  * Returns an escaped attribute value.
  *
  * @link https://w3c.github.io/html/syntax.html#elements-attributes
  *
  * "[...] the text cannot contain an ambiguous ampersand [...] must not contain
  * any literal U+0022 QUOTATION MARK characters (")"
+ *
+ * Additionally we escape the greater than symbol, as this is used by wptexturize to
+ * split HTML tags, and not escaping it can cause problems.
  *
  * @param {string} value Attribute value.
  *
@@ -302,6 +316,7 @@ export function escapeLessThan( value ) {
 export const escapeAttribute = flowRight( [
 	escapeAmpersand,
 	escapeQuotationMark,
+	escapeGreaterThan,
 ] );
 
 /**
