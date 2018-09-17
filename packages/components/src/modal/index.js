@@ -9,6 +9,7 @@ import { noop } from 'lodash';
  */
 import { Component, createPortal } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -152,14 +153,18 @@ class Modal extends Component {
 						describedby: aria.describedby,
 					} }
 					{ ...otherProps } >
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						onClose={ onRequestClose }
-						title={ title }
-						headingId={ headingId }
-						icon={ icon } />
 					<div
-						className={ 'components-modal__content' }>
+						className={ 'components-modal__content' }
+						role="region"
+						aria-label={ __( 'Dialog Contents' ) }
+						tabIndex="0"
+					>
+						<ModalHeader
+							closeLabel={ closeButtonLabel }
+							onClose={ onRequestClose }
+							title={ title }
+							headingId={ headingId }
+							icon={ icon } />
 						{ children }
 					</div>
 				</ModalFrame>
