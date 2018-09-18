@@ -442,7 +442,7 @@ export default class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( {
+		const classes = classnames( className, {
 			'has-fixed-layout': hasFixedLayout,
 		} );
 
@@ -502,8 +502,8 @@ export default class TableEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className={ className }>
-					<table className={ classes } style={ getTableStyles( attributes ) }>
+				<div className={ classes }>
+					<table style={ getTableStyles( attributes ) }>
 						<Section type="head" rows={ head } />
 						<Section type="body" rows={ body } />
 						<Section type="foot" rows={ foot } />

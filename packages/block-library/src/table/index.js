@@ -155,8 +155,8 @@ export const settings = {
 		};
 
 		return (
-			<div>
-				<table className={ classes } style={ getTableStyles( attributes ) }>
+			<div className={ classes }>
+				<table style={ getTableStyles( attributes ) }>
 					<Section type="head" rows={ head } />
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
