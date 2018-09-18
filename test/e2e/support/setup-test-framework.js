@@ -102,6 +102,10 @@ function removePageEvents() {
  * the observed console logging types is encountered.
  */
 function observeConsoleLogging() {
+	page.on( 'requestfailed', ( request ) => {
+		// eslint-disable-next-line no-console
+		console.error( 'Request for ' + request.url() + ' failed' );
+	} );
 	page.on( 'console', ( message ) => {
 		const type = message.type();
 		if ( ! OBSERVED_CONSOLE_MESSAGE_TYPES.hasOwnProperty( type ) ) {
