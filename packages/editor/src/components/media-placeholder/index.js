@@ -15,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -32,11 +33,27 @@ class MediaPlaceholder extends Component {
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
-		this.onlyAllowsImages = this.onlyAllowsImages.bind( this );
+	}
+
+	getAllowedTypes() {
+		const { allowedTypes, allowedType } = this.props;
+		let allowedTypesToUse = allowedTypes;
+		if ( ! allowedTypes && allowedType ) {
+			deprecated( 'allowedType property of wp.editor.MediaPlaceholder', {
+				version: '4.2',
+				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
+			} );
+			if ( allowedType === '*' ) {
+				allowedTypesToUse = undefined;
+			} else {
+				allowedTypesToUse = [ allowedType ];
+			}
+		}
+		return allowedTypesToUse;
 	}
 
 	onlyAllowsImages() {
-		const { allowedTypes } = this.props;
+		const allowedTypes = this.getAllowedTypes();
 		if ( ! allowedTypes ) {
 			return false;
 		}
@@ -73,7 +90,8 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { allowedTypes, onSelect, multiple, onError } = this.props;
+		const { onSelect, multiple, onError } = this.props;
+		const allowedTypes = this.getAllowedTypes();
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
 			allowedTypes,
@@ -86,7 +104,6 @@ class MediaPlaceholder extends Component {
 	render() {
 		const {
 			accept,
-			allowedTypes,
 			icon,
 			className,
 			labels,
@@ -97,7 +114,7 @@ class MediaPlaceholder extends Component {
 			multiple = false,
 			notices,
 		} = this.props;
-
+		const allowedTypes = this.getAllowedTypes();
 		return (
 			<Placeholder
 				icon={ icon }
