@@ -33,7 +33,7 @@ describe( 'new editor state', () => {
 		// cannot leave errors in the console and cause the test to fail.
 		await page.setRequestInterception( true );
 		page.on( 'request', ( request ) => {
-			if ( request.url === '/index.php?rest_route=/oembed/1.0/proxy&url=https%3A%2F%2Fvimeo.com%2F22439234' ) {
+			if ( request.url().indexOf( 'oembed/1.0/proxy' ) !== -1 ) {
 				request.respond( {
 					content: 'application/json',
 					body: JSON.stringify( MOCK_EMBED_RESPONSE ),
@@ -42,6 +42,7 @@ describe( 'new editor state', () => {
 				request.continue();
 			}
 		} );
+
 		await visitAdmin( 'post-new.php', 'gutenberg-demo' );
 	} );
 
