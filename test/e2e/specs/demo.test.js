@@ -11,7 +11,7 @@ describe( 'new editor state', () => {
 	beforeAll( async () => {
 		// Intercept embed requests so that scripts loaded from third parties
 		// cannot leave errors in the console and cause the test to fail.
-		await page.setRequestInterceptionEnabled( true );
+		await page.setRequestInterception( true );
 		page.on( 'request', ( request ) => {
 			if ( request.url === '/index.php?rest_route=/oembed/1.0/proxy&url=https%3A%2F%2Fvimeo.com%2F22439234' ) {
 				request.respond( {
