@@ -75,7 +75,7 @@ const getAttachmentsCollection = ( ids ) => {
 };
 
 class MediaUpload extends Component {
-	constructor( { multiple = false, type, gallery = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
+	constructor( { allowedTypes, multiple = false, gallery = false, title = __( 'Select or Upload Media' ), modalClass, value } ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
 		this.onOpen = this.onOpen.bind( this );
@@ -93,7 +93,7 @@ class MediaUpload extends Component {
 				multiple,
 			} );
 			this.frame = new GalleryDetailsMediaFrame( {
-				mimeType: type,
+				mimeType: allowedTypes,
 				state: currentState,
 				multiple,
 				selection,
@@ -108,8 +108,8 @@ class MediaUpload extends Component {
 				},
 				multiple,
 			};
-			if ( !! type ) {
-				frameConfig.library = { type };
+			if ( !! allowedTypes ) {
+				frameConfig.library = { type: allowedTypes };
 			}
 
 			this.frame = wp.media( frameConfig );

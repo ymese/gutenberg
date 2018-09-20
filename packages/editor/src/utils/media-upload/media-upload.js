@@ -39,17 +39,17 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param   {Object}   $0                   Parameters object passed to the function.
- * @param   {string}   $0.allowedType       The type of media that can be uploaded, or '*' to allow all.
- * @param   {?Object}  $0.additionalData    Additional data to include in the request.
- * @param   {Array}    $0.filesList         List of files.
- * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
- * @param   {Function} $0.onError           Function called when an error happens.
- * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
- * @param   {?Object} $0.allowedMimeTypes   List of allowed mime types and file extensions.
+ * @param   {Object}   $0                          Parameters object passed to the function.
+ * @param   {?Array}   $0.allowedTypes             The types of media that can be uploaded, if unset all types are allowed.
+ * @param   {?Object}  $0.additionalData           Additional data to include in the request.
+ * @param   {Array}    $0.filesList                List of files.
+ * @param   {?number}  $0.maxUploadFileSize        Maximum upload size in bytes allowed for the site.
+ * @param   {Function} $0.onError                  Function called when an error happens.
+ * @param   {Function} $0.onFileChange             Function called each time a file or a temporary representation of the file is available.
+ * @param   {?Object}  $0.globallyAllowedMimeTypes List of allowed mime types and file extensions.
  */
 export function mediaUpload( {
-	allowedType,
+	allowedTypes,
 	additionalData = {},
 	filesList,
 	maxUploadFileSize,
@@ -68,10 +68,17 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		return ( allowedType === '*' ) ||
+		return ( ! allowedTypes ) ||
 			some(
-				( allowedType || '' ).split( ',' ),
-				( type ) => startsWith( fileType, `${ type }/` )
+				allowedTypes,
+				( allowedType ) => {
+					// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
+					if ( includes( allowedType, '/' ) ) {
+						return allowedType === fileType;
+					}
+					// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
+					return startsWith( fileType, `${ allowedType }/` );
+				}
 			);
 	};
 

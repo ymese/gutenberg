@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, noop } from 'lodash';
+import { every, get, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,6 +32,17 @@ class MediaPlaceholder extends Component {
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
+		this.onlyAllowsImages = this.onlyAllowsImages.bind( this );
+	}
+
+	onlyAllowsImages() {
+		const { allowedTypes } = this.props;
+		if ( ! allowedTypes ) {
+			return false;
+		}
+		return every( allowedTypes, ( allowedType ) => {
+			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+		} );
 	}
 
 	componentDidMount() {
@@ -62,10 +73,10 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple, onError } = this.props;
+		const { allowedTypes, onSelect, multiple, onError } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
-			allowedType: type,
+			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
@@ -74,8 +85,8 @@ class MediaPlaceholder extends Component {
 
 	render() {
 		const {
-			type,
 			accept,
+			allowedTypes,
 			icon,
 			className,
 			labels,
@@ -127,10 +138,10 @@ class MediaPlaceholder extends Component {
 					{ __( 'Upload' ) }
 				</FormFileUpload>
 				<MediaUpload
-					gallery={ multiple && type === 'image' }
+					gallery={ multiple && this.onlyAllowsImages() }
 					multiple={ multiple }
 					onSelect={ onSelect }
-					type={ type }
+					allowedTypes={ allowedTypes }
 					value={ value.id }
 					render={ ( { open } ) => (
 						<Button isLarge onClick={ open }>

@@ -31,7 +31,7 @@ describe( 'mediaUpload', () => {
 		mediaUpload( {
 			filesList: [ invalidMediaObj ],
 			onFileChange: onFileChangeSpy,
-			allowedType: 'image',
+			allowedTypes: [ 'image' ],
 			onError,
 		} );
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
@@ -55,7 +55,7 @@ describe( 'mediaUpload', () => {
 			mediaUpload( {
 				filesList: [ testFile ],
 				onFileChange: onFileChangeSpy,
-				allowedType: 'video,image',
+				allowedTypes: [ 'video', 'image' ],
 				onError,
 			} );
 		} ).not.toThrow();
@@ -70,7 +70,7 @@ describe( 'mediaUpload', () => {
 			mediaUpload( {
 				filesList: [ testFile ],
 				onFileChange: onFileChangeSpy,
-				allowedType: 'audio,image',
+				allowedTypes: [ 'audio', 'image' ],
 				onError,
 			} );
 		} ).toThrow();
@@ -84,7 +84,7 @@ describe( 'mediaUpload', () => {
 			mediaUpload( {
 				filesList: [ testFile ],
 				onFileChange: onFileChangeSpy,
-				allowedType: 'image,audio',
+				allowedTypes: [ 'image', 'audio' ],
 				onError,
 			} );
 		} ).toThrow();
@@ -96,7 +96,7 @@ describe( 'mediaUpload', () => {
 		const onError = jest.fn();
 
 		mediaUpload( {
-			allowedType: 'image',
+			allowedTypes: [ 'image' ],
 			filesList: [ validMediaObj ],
 			onFileChange: onFileChangeSpy,
 			maxUploadFileSize: 512,
@@ -111,7 +111,7 @@ describe( 'mediaUpload', () => {
 		const allowedMimeTypes = { aac: 'audio/aac' };
 
 		mediaUpload( {
-			allowedType: 'image',
+			allowedTypes: [ 'image' ],
 			filesList: [ validMediaObj ],
 			onFileChange: onFileChangeSpy,
 			onError,

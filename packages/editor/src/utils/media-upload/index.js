@@ -25,7 +25,7 @@ import { mediaUpload } from './media-upload';
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
 export default function( {
-	allowedType,
+	allowedTypes,
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
@@ -39,7 +39,7 @@ export default function( {
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
 	mediaUpload( {
-		allowedType,
+		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {
